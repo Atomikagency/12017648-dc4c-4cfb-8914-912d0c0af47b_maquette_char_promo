@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Maquette char promo
  * Description: Add extra feature
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: AtomikAgency
  * Author URI: https://atomikagency.fr/
  */
