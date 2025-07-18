@@ -1,0 +1,63 @@
+name: Build Plugin Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Increment Plugin Version
+        run: |
+          FILE="src/maquette_char_promo.php"
+          echo "Incrémentation de la version dans $FILE"
+          VERSION_LINE=$(grep "Version:" $FILE)
+          echo "Ligne de version actuelle: $VERSION_LINE"
+          VERSION=$(echo "$VERSION_LINE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Version actuelle: $VERSION"
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "Nouvelle version: $NEW_VERSION"
+          sed -i "s/$VERSION/$NEW_VERSION/" $FILE
+          grep "Version:" $FILE
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit Updated Version
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add src/maquette_char_promo.php
+          git commit -m "Bump plugin version to $VERSION"
+          git push
+
+      - name: Prepare Plugin Directory
+        run: |
+          mkdir -p build/maquette_char_promo
+          cp -r src/* build/maquette_char_promo/
+          rm -rf build/maquette_char_promo/.git build/maquette_char_promo/.github
+
+      - name: Zip Plugin
+        run: |
+          cd build && zip -r maquette_char_promo.zip maquette_char_promo
+          mv maquette_char_promo.zip ../plugin.zip
+
+      - name: Upload Release
+        env:
+          API_URL: "https://plugin-manager.atomikagency.fr"
+        run: |
+          echo "Upload du fichier plugin.zip avec la version $VERSION"
+
+          curl -X POST \
+            -F "plugin_id=12017648-dc4c-4cfb-8914-912d0c0af47b" \
+            -F "zip_file=@plugin.zip" \
+            -F "version=$VERSION" \
+            $API_URL/api/releases
