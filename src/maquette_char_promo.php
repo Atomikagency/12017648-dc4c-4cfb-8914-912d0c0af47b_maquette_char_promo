@@ -29,3 +29,6 @@ require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'include/premium-admin.php';
 
 // Shortcodes
 require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'include/shortcodes.php';
+
+// Product export
+require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'include/product-export.php';
