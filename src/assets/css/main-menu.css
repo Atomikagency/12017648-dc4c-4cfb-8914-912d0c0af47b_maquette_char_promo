@@ -1,0 +1,531 @@
+/**
+ * Maquette Char Promo - Main Menu Styles
+ * Version: 1.0.0
+ */
+
+/* ============================================
+   MAIN MENU WRAPPER
+   ============================================ */
+
+.maquette-main-menu-wrapper {
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+.maquette-menu-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 70px;
+}
+
+/* ============================================
+   LOGO
+   ============================================ */
+
+.maquette-menu-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.maquette-logo-img {
+    max-height: 50px;
+    width: auto;
+}
+
+.maquette-site-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    text-decoration: none;
+}
+
+/* ============================================
+   NAVIGATION MENU
+   ============================================ */
+
+.maquette-menu-nav {
+    flex: 1;
+    margin: 0 30px;
+}
+
+.maquette-nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+}
+
+.maquette-nav-menu li {
+    position: relative;
+}
+
+.maquette-nav-menu > li > a {
+    display: block;
+    padding: 12px 18px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.maquette-nav-menu > li > a:hover,
+.maquette-nav-menu > li.current-menu-item > a {
+    background: #f5f5f5;
+    color: #667eea;
+}
+
+/* Submenu */
+.maquette-nav-menu .sub-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    min-width: 200px;
+    padding: 10px 0;
+    margin: 0;
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.maquette-nav-menu li:hover > .sub-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.maquette-nav-menu .sub-menu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.maquette-nav-menu .sub-menu li a:hover {
+    background: #f9f9f9;
+    color: #667eea;
+    padding-left: 25px;
+}
+
+/* ============================================
+   MENU ACTIONS (Right Section)
+   ============================================ */
+
+.maquette-menu-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* ============================================
+   SEARCH
+   ============================================ */
+
+.maquette-menu-search {
+    position: relative;
+}
+
+.maquette-search-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: #555;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.maquette-search-toggle:hover {
+    color: #667eea;
+}
+
+.maquette-search-form-wrapper {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    padding: 15px;
+    min-width: 300px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.maquette-search-form-wrapper.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.maquette-search-form {
+    display: flex;
+    gap: 5px;
+}
+
+.maquette-search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.maquette-search-input:focus {
+    border-color: #667eea;
+}
+
+.maquette-search-submit {
+    background: #667eea;
+    border: none;
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.maquette-search-submit:hover {
+    background: #5568d3;
+}
+
+/* ============================================
+   CART
+   ============================================ */
+
+.maquette-menu-cart {
+    position: relative;
+}
+
+.maquette-cart-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: #f5f5f5;
+    border-radius: 25px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.maquette-cart-link:hover {
+    background: #667eea;
+    color: #ffffff;
+}
+
+.maquette-cart-link .dashicons {
+    font-size: 20px;
+}
+
+.maquette-cart-count {
+    background: #e63946;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.maquette-cart-total {
+    font-weight: 600;
+}
+
+/* ============================================
+   ACCOUNT
+   ============================================ */
+
+.maquette-menu-account {
+    position: relative;
+}
+
+.maquette-account-login {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: #667eea;
+    color: #ffffff;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.maquette-account-login:hover {
+    background: #5568d3;
+}
+
+.maquette-account-dropdown {
+    position: relative;
+}
+
+.maquette-account-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.maquette-account-toggle:hover {
+    background: #e8e8e8;
+}
+
+.maquette-account-name {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.maquette-premium-badge-small {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.maquette-account-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    min-width: 220px;
+    padding: 10px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.maquette-account-dropdown-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.maquette-account-dropdown-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.maquette-account-dropdown-menu li {
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.maquette-account-dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.maquette-account-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.maquette-account-dropdown-menu a:hover {
+    background: #f9f9f9;
+    color: #667eea;
+    padding-left: 25px;
+}
+
+.maquette-account-dropdown-menu .dashicons {
+    font-size: 18px;
+}
+
+.maquette-premium-item a {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.maquette-logout-item {
+    margin-top: 5px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.maquette-logout-item a {
+    color: #e63946;
+}
+
+.maquette-logout-item a:hover {
+    background: #ffe5e7;
+    color: #d62828;
+}
+
+/* ============================================
+   MOBILE TOGGLE
+   ============================================ */
+
+.maquette-mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 992px) {
+    .maquette-menu-nav {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin: 0;
+    }
+
+    .maquette-menu-nav.active {
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+
+    .maquette-nav-menu {
+        flex-direction: column;
+        gap: 0;
+        padding: 20px;
+    }
+
+    .maquette-nav-menu .sub-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        padding-left: 20px;
+        margin-top: 5px;
+    }
+
+    .maquette-mobile-toggle {
+        display: block;
+    }
+
+    .maquette-menu-actions {
+        gap: 10px;
+    }
+
+    .maquette-cart-link,
+    .maquette-account-toggle {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .maquette-account-name span {
+        display: none;
+    }
+
+    .maquette-search-form-wrapper {
+        right: auto;
+        left: 0;
+        min-width: 250px;
+    }
+}
+
+@media (max-width: 576px) {
+    .maquette-menu-container {
+        padding: 0 10px;
+        min-height: 60px;
+    }
+
+    .maquette-logo-img {
+        max-height: 40px;
+    }
+
+    .maquette-site-title {
+        font-size: 18px;
+    }
+
+    .maquette-cart-total {
+        display: none;
+    }
+
+    .maquette-menu-actions {
+        gap: 5px;
+    }
+
+    .maquette-account-login span {
+        display: none;
+    }
+}
+
+/* ============================================
+   MENU NOTICE (for admin when no menu assigned)
+   ============================================ */
+
+.maquette-menu-notice {
+    padding: 15px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 5px;
+    color: #856404;
+    font-size: 14px;
+}
+
+.maquette-menu-notice a {
+    color: #856404;
+    font-weight: 600;
+    text-decoration: underline;
+}
