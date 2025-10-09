@@ -52,7 +52,7 @@ function maquette_apply_premium_discount($price, $product) {
 /**
  * Display premium price HTML on product pages (only for premium members)
  */
-add_filter(hook_name: 'woocommerce_get_price_html', 'maquette_display_premium_price_html', 99, 2);
+add_filter( 'woocommerce_get_price_html', 'maquette_display_premium_price_html', 99, 2);
 function maquette_display_premium_price_html($price_html, $product) {
     
         if ( isset($_GET['et_fb']) || isset($_GET['et_tb']) ) {
@@ -94,6 +94,7 @@ function maquette_display_premium_price_html($price_html, $product) {
     }
 
         $base_price = (float) $base_price;
+
     $premium_price = $base_price * (1 - ($discount_rate / 100));
 
     // Build custom HTML
