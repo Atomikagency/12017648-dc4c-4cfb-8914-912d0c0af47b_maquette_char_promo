@@ -52,10 +52,26 @@ function maquette_apply_premium_discount($price, $product) {
 /**
  * Display premium price HTML on product pages (only for premium members)
  */
-add_filter('woocommerce_get_price_html', 'maquette_display_premium_price_html', 99, 2);
+add_filter(hook_name: 'woocommerce_get_price_html', 'maquette_display_premium_price_html', 99, 2);
 function maquette_display_premium_price_html($price_html, $product) {
+    
+        if ( isset($_GET['et_fb']) || isset($_GET['et_tb']) ) {
+        return $price_html;
+    }
+  if ( is_admin() && ! wp_doing_ajax() ) {
+        return $price_html;
+    }
+
+     if ( ! $product instanceof WC_Product ) {
+        return $price_html;
+    }
+
+
+       if ( $product->is_type('variable') ) {
+        return $price_html;
+    }
     // Only show premium pricing to premium members
-    if (!maquette_is_premium_active()) {
+   if ( ! function_exists('maquette_is_premium_active') || ! maquette_is_premium_active() ) {
         return $price_html;
     }
 
@@ -72,11 +88,13 @@ function maquette_display_premium_price_html($price_html, $product) {
 
     // Calculate premium price
     $base_price = $sale_price ? $sale_price : $original_price;
-    $premium_price = $base_price * (1 - ($discount_rate / 100));
 
-    if (!$base_price || $base_price <= 0) {
+    if (!$base_price || $base_price <= 0 || $base_price === '' || !is_numeric($base_price) ) {
         return $price_html;
     }
+
+        $base_price = (float) $base_price;
+    $premium_price = $base_price * (1 - ($discount_rate / 100));
 
     // Build custom HTML
     $html = '<div class="maquette-premium-pricing">';
