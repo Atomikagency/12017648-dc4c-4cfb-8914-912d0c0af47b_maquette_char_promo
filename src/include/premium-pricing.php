@@ -100,13 +100,9 @@ function maquette_display_premium_price_html($price_html, $product) {
     // Build custom HTML
     $html = '<div class="maquette-premium-pricing">';
 
-    // Show original price (struck through if there's a sale)
-    if ($sale_price && $sale_price < $original_price) {
-        $html .= '<span class="maquette-price-original"><del>' . wc_price($original_price) . '</del></span> ';
-        $html .= '<span class="maquette-price-sale">' . wc_price($sale_price) . '</span> ';
-    } else {
-        $html .= '<span class="maquette-price-original"><del>' . wc_price($original_price) . '</del></span> ';
-    }
+
+    // Show only: original price (struck through) + member price
+    $html .= '<span class="maquette-price-original"><del>' . wc_price($original_price) . '</del></span> ';
 
     // Show premium badge + price
     $html .= '<span class="maquette-premium-badge">' . __('Prix membre', 'maquette-char-promo') . '</span> ';
