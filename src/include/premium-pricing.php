@@ -54,7 +54,7 @@ function maquette_apply_premium_discount($price, $product) {
  */
 add_filter( 'woocommerce_get_price_html', 'maquette_display_premium_price_html', 99, 2);
 function maquette_display_premium_price_html($price_html, $product) {
-    
+
         if ( isset($_GET['et_fb']) || isset($_GET['et_tb']) ) {
         return $price_html;
     }
@@ -81,10 +81,22 @@ function maquette_display_premium_price_html($price_html, $product) {
         return $price_html;
     }
 
+    // Temporarily remove premium discount filters to get real prices
+    remove_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99);
+    remove_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99);
+    remove_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99);
+    remove_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99);
+
     // Get original price (without premium discount)
     $original_price = $product->get_regular_price();
     $sale_price = $product->get_sale_price();
     $discount_rate = maquette_get_premium_discount_rate();
+
+    // Restore premium discount filters
+    add_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99, 2);
+    add_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
+    add_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99, 2);
+    add_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
 
     // Calculate premium price
     $base_price = $sale_price ? $sale_price : $original_price;
