@@ -1,216 +1,114 @@
 <?php
+if (!defined('ABSPATH')) { exit; }
 
-if (!defined('ABSPATH')) {
-    exit; // Prevent direct access
-}
-
-/**
- * Premium Pricing System
- * - Apply -8% discount (cumulative with existing promotions)
- * - Display member price on frontend (only for premium members)
- */
-
-/**
- * Get premium discount rate from settings
- * @return float
- */
+// Taux en % (par défaut 8)
 function maquette_get_premium_discount_rate() {
     return floatval(get_option('maquette_premium_discount_rate', 8));
 }
 
-// /**
-//  * Apply premium discount to product price (cumulative)
-//  * Works for simple and variable products
-//  */
-// add_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99, 2);
-// add_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
-// add_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99, 2);
-// add_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
-// function maquette_apply_premium_discount($price, $product) {
-//     // Only apply if user is premium member
-//     if (!maquette_is_premium_active()) {
-//         return $price;
-//     }
+// === Appliquer la remise premium sur les prix (une seule fois) ===
+add_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99, 2);
+add_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
+add_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99, 2);
+add_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
 
-//     // Don't apply to premium subscription products themselves
-//     $premium_product_ids = maquette_get_premium_product_ids();
-//     if (in_array($product->get_id(), $premium_product_ids)) {
-//         return $price;
-//     }
+function maquette_apply_premium_discount($price, $product) {
+    // Uniquement pour les membres premium
+    if (!function_exists('maquette_is_premium_active') || !maquette_is_premium_active()) {
+        return $price;
+    }
 
-//     // Calculate discount
-//     if ($price && is_numeric($price)) {
-//         $discount_rate = maquette_get_premium_discount_rate();
-//         $discounted_price = $price * (1 - ($discount_rate / 100));
+    // Ne pas appliquer sur les produits d'abonnement premium
+    if (function_exists('maquette_get_premium_product_ids')) {
+        $premium_product_ids = maquette_get_premium_product_ids();
+        if (in_array($product->get_id(), (array) $premium_product_ids, true)) {
+            return $price;
+        }
+    }
 
-//         return round($discounted_price, 2);
-//     }
+    if ($price === '' || !is_numeric($price)) {
+        return $price;
+    }
 
-//     return $price;
-// }
+    $regular = (float) $product->get_regular_price();
+    if ($regular <= 0) {
+        // S’il n’y a pas de regular price, on ne peut pas calculer la part -8% d’origine
+        return $price;
+    }
 
-// /**
-//  * Display premium price HTML on product pages (only for premium members)
-//  */
-// add_filter( 'woocommerce_get_price_html', 'maquette_display_premium_price_html', 99, 2);
-// function maquette_display_premium_price_html($price_html, $product) {
+    $rate = maquette_get_premium_discount_rate();
+    // Calculer la remise premium SUR LE PRIX D’ORIGINE
+    $premium_discount_from_regular = $regular * ($rate / 100);
 
-//         if ( isset($_GET['et_fb']) || isset($_GET['et_tb']) ) {
-//         return $price_html;
-//     }
-//   if ( is_admin() && ! wp_doing_ajax() ) {
-//         return $price_html;
-//     }
+    // Prix courant (peut déjà incorporer -20% via sale price)
+    $current = (float) $price;
 
-//      if ( ! $product instanceof WC_Product ) {
-//         return $price_html;
-//     }
+    // Prix membre = prix courant - (8% du regular)
+    $member_price = max(0, $current - $premium_discount_from_regular);
 
+    // Retourner un décimal WooCommerce correct
+    return wc_format_decimal($member_price, wc_get_price_decimals());
+}
 
-//        if ( $product->is_type('variable') ) {
-//         return $price_html;
-//     }
-//     // Only show premium pricing to premium members
-//    if ( ! function_exists('maquette_is_premium_active') || ! maquette_is_premium_active() ) {
-//         return $price_html;
-//     }
+// === Affichage du prix membre sur la fiche produit (pour les membres) ===
+add_filter('woocommerce_get_price_html', 'maquette_display_premium_price_html', 99, 2);
+function maquette_display_premium_price_html($price_html, $product) {
 
-//     // Don't show on premium subscription products
-//     $premium_product_ids = maquette_get_premium_product_ids();
-//     if (in_array($product->get_id(), $premium_product_ids)) {
-//         return $price_html;
-//     }
+    // Ne pas casser l’éditeur et l’admin
+    if (isset($_GET['et_fb']) || isset($_GET['et_tb'])) return $price_html;
+    if (is_admin() && !wp_doing_ajax()) return $price_html;
+    if (!$product instanceof WC_Product) return $price_html;
 
-//     // Temporarily remove premium discount filters to get real prices
-//     remove_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99);
-//     remove_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99);
-//     remove_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99);
-//     remove_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99);
+    // Optionnel : pour les variables, on laisse le html par défaut
+    if ($product->is_type('variable')) return $price_html;
 
-//     // Get original price (without premium discount)
-//     $original_price = $product->get_regular_price();
-//     $sale_price = $product->get_sale_price();
-//     $discount_rate = maquette_get_premium_discount_rate();
+    if (!function_exists('maquette_is_premium_active') || !maquette_is_premium_active()) return $price_html;
 
-//     // Restore premium discount filters
-//     add_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99, 2);
-//     add_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
-//     add_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99, 2);
-//     add_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
+    if (function_exists('maquette_get_premium_product_ids')) {
+        $premium_product_ids = maquette_get_premium_product_ids();
+        if (in_array($product->get_id(), (array) $premium_product_ids, true)) return $price_html;
+    }
 
-//     // Calculate premium price
-//     $base_price = $sale_price ? $sale_price : $original_price;
+    // On veut afficher le prix public actuel (non-membre) + le prix membre
+    // → On enlève temporairement le filtre qui applique la remise premium
+    remove_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99);
+    remove_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99);
+    remove_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99);
+    remove_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99);
 
-//     if (!$base_price || $base_price <= 0 || $base_price === '' || !is_numeric($base_price) ) {
-//         return $price_html;
-//     }
+    $regular    = (float) $product->get_regular_price();
+    $public_now = (float) $product->get_price(); // prix que voit un non-membre (peut déjà être -20%)
 
-//         $base_price = (float) $base_price;
+    // On remet les filtres
+    add_filter('woocommerce_product_get_price', 'maquette_apply_premium_discount', 99, 2);
+    add_filter('woocommerce_product_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
+    add_filter('woocommerce_product_variation_get_price', 'maquette_apply_premium_discount', 99, 2);
+    add_filter('woocommerce_product_variation_get_sale_price', 'maquette_apply_premium_discount', 99, 2);
 
-//     $premium_price = $base_price * (1 - ($discount_rate / 100));
+    if ($regular <= 0 || $public_now <= 0) {
+        return $price_html;
+    }
 
-//     // Build custom HTML
-//     $html = '<div class="maquette-premium-pricing">';
+    $rate = maquette_get_premium_discount_rate();
+    $premium_discount_from_regular = $regular * ($rate / 100);
+    $member_price = max(0, $public_now - $premium_discount_from_regular);
 
+    // HTML : on barre le prix public actuel, puis on affiche le prix membre
+    $html  = '<div class="maquette-premium-pricing">';
+    $html .= '<span class="maquette-price-public"><del>' . wc_price($public_now) . '</del></span> ';
+    $html .= '<span class="maquette-premium-badge">' . esc_html__('Prix membre', 'maquette-char-promo') . '</span> ';
+    $html .= '<span class="maquette-premium-price">' . wc_price($member_price) . '</span>';
+    $html .= '</div>';
 
-//     // Show only: original price (struck through) + member price
-//     $html .= '<span class="maquette-price-original"><del>' . wc_price($original_price) . '</del></span> ';
+    return $html;
+}
 
-//     // Show premium badge + price
-//     $html .= '<span class="maquette-premium-badge">' . __('Prix membre', 'maquette-char-promo') . '</span> ';
-//     $html .= '<span class="maquette-premium-price">' . wc_price($premium_price) . '</span>';
-
-//     $html .= '</div>';
-
-//     return $html;
-// }
-
-// /**
-//  * Ensure cart calculations use premium pricing
-//  */
+// === IMPORTANT : ne pas redéduire dans le panier ===
+// Supprime/LAISSE COMMENTÉ l’action suivante pour éviter la double remise.
 // add_action('woocommerce_before_calculate_totals', 'maquette_apply_premium_discount_to_cart', 99);
-// function maquette_apply_premium_discount_to_cart($cart) {
-//     if (is_admin() && !defined('DOING_AJAX')) {
-//         return;
-//     }
+// function maquette_apply_premium_discount_to_cart($cart) { /* plus nécessaire */ }
 
-//     if (did_action('woocommerce_before_calculate_totals') >= 2) {
-//         return;
-//     }
-
-//     // Only apply if user is premium member
-//     if (!maquette_is_premium_active()) {
-//         return;
-//     }
-
-//     $discount_rate = maquette_get_premium_discount_rate();
-//     $premium_product_ids = maquette_get_premium_product_ids();
-
-//     foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
-//         $product = $cart_item['data'];
-//         $product_id = $product->get_id();
-
-//         // Don't apply discount to premium subscription products
-//         if (in_array($product_id, $premium_product_ids)) {
-//             continue;
-//         }
-
-//         // Get current price (may already include sale price)
-//         $price = $product->get_price();
-
-//         if ($price && is_numeric($price)) {
-//             $discounted_price = $price * (1 - ($discount_rate / 100));
-//             $product->set_price(round($discounted_price, 2));
-//         }
-//     }
-// }
-
-// /**
-//  * Show premium discount in cart/checkout summary
-//  */
-// add_filter('woocommerce_cart_item_price', 'maquette_display_premium_cart_item_price', 99, 3);
-// function maquette_display_premium_cart_item_price($price_html, $cart_item, $cart_item_key) {
-//     if (!maquette_is_premium_active()) {
-//         return $price_html;
-//     }
-
-//     $product = $cart_item['data'];
-//     $premium_product_ids = maquette_get_premium_product_ids();
-
-//     if (in_array($product->get_id(), $premium_product_ids)) {
-//         return $price_html;
-//     }
-
-//     // Add badge to indicate premium pricing
-//     $html = '<span class="maquette-cart-premium-badge" style="font-size: 0.85em; color: #2c7a3c; font-weight: bold;">';
-//     $html .= __('Prix membre', 'maquette-char-promo');
-//     $html .= '</span><br>';
-//     $html .= $price_html;
-
-//     return $html;
-// }
-
-// /**
-//  * Display premium member status in cart summary
-//  */
-// add_action('woocommerce_cart_totals_before_order_total', 'maquette_display_premium_info_in_cart');
-// add_action('woocommerce_review_order_before_order_total', 'maquette_display_premium_info_in_cart');
-// function maquette_display_premium_info_in_cart() {
-//     if (!maquette_is_premium_active()) {
-//         return;
-//     }
-
-//     $discount_rate = maquette_get_premium_discount_rate();
-
-//     echo '<tr class="maquette-premium-info">';
-//     echo '<th style="color: #2c7a3c;">✓ ' . __('Réduction membre premium', 'maquette-char-promo') . '</th>';
-//     echo '<td style="color: #2c7a3c; font-weight: bold;">-' . $discount_rate . '%</td>';
-//     echo '</tr>';
-// }
-
-/**
- * Add premium pricing CSS to frontend
- */
+// CSS
 add_action('wp_enqueue_scripts', 'maquette_enqueue_premium_css');
 function maquette_enqueue_premium_css() {
     wp_enqueue_style(
