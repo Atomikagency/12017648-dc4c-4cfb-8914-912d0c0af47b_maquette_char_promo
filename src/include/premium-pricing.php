@@ -10,8 +10,7 @@ function maquette_get_premium_discount_rate()
 }
 
 function maquette_get_excluded_product_ids() {
-    // Ajoutez ici les ID des produits qui ne doivent JAMAIS avoir de réduction.
-    return [123, 456, 789]; 
+    return [153543]; 
 }
 
 add_filter('woocommerce_product_get_sale_price', 'maquette_calculate_dynamic_price', 9999, 2);
