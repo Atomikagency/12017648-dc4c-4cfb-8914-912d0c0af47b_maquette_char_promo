@@ -1,0 +1,47 @@
+/**
+ * Search Facets Styles
+ * Shortcode: [mcp_search]
+ */
+
+.mcp-search-facets {
+    /* Container styles - to be implemented */
+}
+
+.mcp-search-field {
+    margin-bottom: 20px;
+}
+
+.mcp-search-field label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.mcp-search-field input {
+    width: 100%;
+    padding: 8px;
+}
+
+.mcp-price-filters,
+.mcp-status-filters,
+.mcp-categories-filter,
+.mcp-tags-filter,
+.mcp-attributes-filter,
+.mcp-sort-filter {
+    margin-bottom: 20px;
+}
+
+.mcp-price-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.mcp-search-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.mcp-search-actions button {
+    padding: 10px 20px;
+    cursor: pointer;
+}

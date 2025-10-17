@@ -98,3 +98,147 @@ function maquette_cart_count_fragment($fragments) {
 
     return $fragments;
 }
+
+/**
+ * Shortcode: [mcp_products]
+ * Displays products list loaded via AJAX
+ *
+ * @param array $atts Shortcode attributes
+ * @return string HTML output
+ */
+add_shortcode('mcp_products', 'maquette_products_list_shortcode');
+function maquette_products_list_shortcode($atts) {
+    // Mark that this shortcode is present on the page
+    if (!isset($GLOBALS['mcp_shortcodes'])) {
+        $GLOBALS['mcp_shortcodes'] = [];
+    }
+    $GLOBALS['mcp_shortcodes']['products_list'] = true;
+
+    // Parse attributes
+    $atts = shortcode_atts([
+        'limit'              => 12,
+        'interactWithSearch' => false,
+        'filters'            => '{}', // JSON string
+    ], $atts, 'mcp_products');
+
+    // Sanitize
+    $limit = absint($atts['limit']);
+    $interact_with_search = filter_var($atts['interactWithSearch'], FILTER_VALIDATE_BOOLEAN);
+    $filters = json_decode($atts['filters'], true);
+    if (!is_array($filters)) {
+        $filters = [];
+    }
+
+    // Prepare data for JS
+    $data = [
+        'limit'              => $limit,
+        'interactWithSearch' => $interact_with_search,
+        'filters'            => $filters,
+    ];
+
+    // Start output buffering
+    ob_start();
+
+    // Include template (variables are accessible via current scope)
+    include MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'template/products-list.php';
+
+    // Return buffered content
+    return ob_get_clean();
+}
+
+/**
+ * Shortcode: [mcp_search]
+ * Displays faceted search interface
+ *
+ * @param array $atts Shortcode attributes
+ * @return string HTML output
+ */
+add_shortcode('mcp_search', 'maquette_search_facets_shortcode');
+function maquette_search_facets_shortcode($atts) {
+    // Mark that this shortcode is present on the page
+    if (!isset($GLOBALS['mcp_shortcodes'])) {
+        $GLOBALS['mcp_shortcodes'] = [];
+    }
+    $GLOBALS['mcp_shortcodes']['search_facets'] = true;
+
+    // Parse attributes
+    $atts = shortcode_atts([
+        'defaults' => '{}', // JSON string
+    ], $atts, 'mcp_search');
+
+    // Sanitize
+    $defaults = json_decode($atts['defaults'], true);
+    if (!is_array($defaults)) {
+        $defaults = [];
+    }
+
+    // Prepare data for JS
+    $data = [
+        'defaults' => $defaults,
+    ];
+
+    // Start output buffering
+    ob_start();
+
+    // Include template (variables are accessible via current scope)
+    include MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'template/search-facets.php';
+
+    // Return buffered content
+    return ob_get_clean();
+}
+
+/**
+ * Conditionally enqueue assets based on shortcode presence
+ */
+add_action('wp_enqueue_scripts', 'maquette_enqueue_products_assets');
+function maquette_enqueue_products_assets() {
+    // Check if shortcodes are present
+    $has_products_list = isset($GLOBALS['mcp_shortcodes']['products_list']);
+    $has_search_facets = isset($GLOBALS['mcp_shortcodes']['search_facets']);
+
+    // Enqueue products list assets
+    if ($has_products_list) {
+        wp_enqueue_style(
+            'mcp-products-list',
+            MAQUETTE_CHAR_PROMO_PLUGIN_URL . 'assets/css/products-list.css',
+            [],
+            '1.0.0'
+        );
+
+        wp_enqueue_script(
+            'mcp-products-list',
+            MAQUETTE_CHAR_PROMO_PLUGIN_URL . 'assets/js/products-list.js',
+            [],
+            '1.0.0',
+            true
+        );
+
+        wp_localize_script('mcp-products-list', 'mcpProductsListConfig', [
+            'restUrl' => rest_url('maquettecharpromo/v1/products'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    // Enqueue search facets assets
+    if ($has_search_facets) {
+        wp_enqueue_style(
+            'mcp-search-facets',
+            MAQUETTE_CHAR_PROMO_PLUGIN_URL . 'assets/css/search-facets.css',
+            [],
+            '1.0.0'
+        );
+
+        wp_enqueue_script(
+            'mcp-search-facets',
+            MAQUETTE_CHAR_PROMO_PLUGIN_URL . 'assets/js/search-facets.js',
+            [],
+            '1.0.0',
+            true
+        );
+
+        wp_localize_script('mcp-search-facets', 'mcpSearchFacetsConfig', [
+            'restUrl' => rest_url('maquettecharpromo/v1/products'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+}

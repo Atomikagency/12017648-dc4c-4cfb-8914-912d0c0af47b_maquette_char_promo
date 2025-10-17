@@ -21,6 +21,7 @@ require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'update-checker.php';
 // Include files (backend functions)
 require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'include/product-fields.php';
 require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'include/api-endpoints.php';
+require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'include/rest-products.php';
 
 // Premium membership system
 require_once MAQUETTE_CHAR_PROMO_PLUGIN_DIR . 'include/premium-membership.php';

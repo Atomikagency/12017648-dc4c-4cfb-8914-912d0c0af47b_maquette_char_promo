@@ -1,0 +1,21 @@
+/**
+ * Products List Styles
+ * Shortcode: [mcp_products]
+ */
+
+.mcp-products-list {
+    /* Container styles - to be implemented */
+}
+
+.mcp-products-loading {
+    padding: 20px;
+    text-align: center;
+}
+
+.mcp-products-container {
+    /* Products grid/list - to be implemented */
+}
+
+.mcp-products-pagination {
+    /* Pagination - to be implemented */
+}
