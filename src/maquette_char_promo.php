@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Maquette char promo
  * Description: Add extra feature with WooCommerce customer groups and metadata
- * Version: 1.1.9
+ * Version: 1.1.10
  * Author: AtomikAgency
  * Author URI: https://atomikagency.fr/
  */
